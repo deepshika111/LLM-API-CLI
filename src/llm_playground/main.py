@@ -2,34 +2,33 @@
 
 from llm_playground.client import LLMClient
 from llm_playground.settings import load_settings
+from llm_playground.cli import parse_arguments
 
 
 def main() -> None:
     """Send one prompt to the configured LLM."""
+    """Parse input, call the LLM, and display the result."""
+
 
     settings = load_settings()
     client = LLMClient(settings)
+    arguments = parse_arguments()
 
-    prompt = (
-    "Explain what an API is to a complete beginner. "
-    "Use one real-world analogy and one software example. "
-    "Keep the explanation under 100 words."
-    )
-
-    print(f"Model: {settings.model}")
-    print(f"Prompt: {prompt}")
-    print("\nAssistant:")
-
-    result = client.generate(prompt)
+    result = client.generate(arguments.prompt)
     print(result.text)
 
-    print("\n--- Response information ---")
-    print(f"Response ID: {result.response_id}")
-    print(f"Status: {result.status}")
-    print(f"Returned model: {result.model_used}")
-    print(f"Input tokens: {result.input_tokens}")
-    print(f"Output tokens: {result.output_tokens}")
-    print(f"Total tokens: {result.total_tokens}")
+    print(f"Model: {settings.model}")
+    print(f"Prompt: {arguments.prompt}")
+    print("\nAssistant:")
+    
+    if arguments.show_metadata:
+        print("\n--- Response information ---")
+        print(f"Response ID: {result.response_id}")
+        print(f"Status: {result.status}")
+        print(f"Returned model: {result.model_used}")
+        print(f"Input tokens: {result.input_tokens}")
+        print(f"Output tokens: {result.output_tokens}")
+        print(f"Total tokens: {result.total_tokens}")
     
 
 
