@@ -12,6 +12,7 @@ class Settings:
 
     api_key:str
     model:str
+    base_url: str
     request_timeout_seconds:float
 
 def load_settings () -> Settings:
@@ -20,6 +21,7 @@ def load_settings () -> Settings:
     api_key = os.getenv("OPENAI_API_KEY")
     model = os.getenv("OPENAI_MODEL")
     timeout_text = os.getenv("REQUEST_TIMEOUT_SECONDS", "30")
+    base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 
 
     if not api_key:
@@ -48,6 +50,7 @@ def load_settings () -> Settings:
 
     return Settings(
         api_key = api_key,
+        base_url=base_url,
         model = model,
         request_timeout_seconds = request_timeout_seconds
     )

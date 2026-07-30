@@ -14,15 +14,12 @@ A command-line application for learning and experimenting with the core LLM API 
 - Retry temporary failures
 - Record structured operational logs
 
-## Current status
 
 Phase 1: project environment and repository setup.
 
-## Current status
-
 Phase 2: a validated, non-streaming request can be sent through the OpenAI Responses API.
 
-## Current request flow
+## request flow
 
 1. Load environment variables.
 2. Validate the API key, model, and timeout.
@@ -30,3 +27,20 @@ Phase 2: a validated, non-streaming request can be sent through the OpenAI Respo
 4. Submit one text prompt.
 5. Wait for the complete response.
 6. Extract and print the generated text.
+
+Phase 3: the application now extracts a structured result from each
+non-streaming API response.
+
+## Response information captured
+
+- Response ID
+- Completion status
+- Returned model
+- Generated text
+- Input-token usage
+- Output-token usage
+- Total-token usage
+
+The raw OpenAI response is converted into an application-level
+`GenerationResult` object.
+
