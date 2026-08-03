@@ -110,3 +110,26 @@ Input tokens: 17
 Output tokens: 904
 Total tokens: 921
 
+## Structured messages
+
+Requests are sent using role-based messages:
+
+- `developer` defines application behavior.
+- `user` contains the command-line prompt.
+- `assistant` will represent previous model responses when conversation
+  history is introduced.
+
+Current request structure:
+
+```python
+[
+    {
+        "role": "developer",
+        "content": "Explain programming concepts clearly.",
+    },
+    {
+        "role": "user",
+        "content": "What is recursion?",
+    },
+]
+

@@ -4,6 +4,7 @@ from openai import OpenAI
 from llm_playground.settings import Settings
 from openai.types.responses import Response
 from dataclasses import dataclass
+from llm_playground.messages import build_messages
 
 
 @dataclass(frozen=True)
@@ -33,15 +34,20 @@ class LLMClient:
         )
 
 
-    def generate (self, prompt:str) -> GenerationResult:
+    def generate(self,developer_instruction: str,user_prompt: str,) -> GenerationResult:
         """ Send a prompt and return generated text """
 
-        if not prompt.strip():
+        if not user_prompt.strip():
             raise ValueError("The prompt cannot be empty.")
+
+        messages = build_messages(
+            developer_instruction=developer_instruction,
+            user_prompt=user_prompt,
+        )
 
         response = self._client.responses.create (
             model=self._settings.model,
-            input=prompt,
+            input=messages,
         )
 
         if response.status != 'completed':

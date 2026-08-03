@@ -5,6 +5,7 @@ from llm_playground.settings import load_settings
 from llm_playground.cli import parse_arguments
 
 
+
 def main() -> None:
     """Send one prompt to the configured LLM."""
     """Parse input, call the LLM, and display the result."""
@@ -14,13 +15,22 @@ def main() -> None:
     client = LLMClient(settings)
     arguments = parse_arguments()
 
-    result = client.generate(arguments.prompt)
+    developer_instruction = (
+    "You are a patient programming teacher. "
+    "Explain concepts in clear, beginner-friendly language. "
+    "Use a small example when it improves understanding."
+)
+
+    result = client.generate(
+    developer_instruction=developer_instruction,
+    user_prompt=arguments.prompt,
+)
     print(result.text)
 
     print(f"Model: {settings.model}")
     print(f"Prompt: {arguments.prompt}")
     print("\nAssistant:")
-    
+
     if arguments.show_metadata:
         print("\n--- Response information ---")
         print(f"Response ID: {result.response_id}")

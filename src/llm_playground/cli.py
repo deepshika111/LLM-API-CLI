@@ -4,7 +4,7 @@ import argparse
 from dataclasses import dataclass
 from typing import Sequence
 
-
+:
 @dataclass(frozen=True)
 class CLIArguments:
     """Validated values supplied through the command line."""
