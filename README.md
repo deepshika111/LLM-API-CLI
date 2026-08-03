@@ -133,3 +133,12 @@ Current request structure:
     },
 ]
 
+## Limit generated output
+
+Set an optional maximum output-token budget:
+
+```bash
+PYTHONPATH=src python -m llm_playground.main \
+  --prompt "Explain Python classes." \
+  --max-output-tokens 500 \
+  --show-metadata

@@ -24,6 +24,7 @@ def main() -> None:
     result = client.generate(
     developer_instruction=developer_instruction,
     user_prompt=arguments.prompt,
+    max_output_tokens=arguments.max_output_tokens,
 )
     print(result.text)
 

@@ -18,6 +18,9 @@ class GenerationResult:
     input_tokens: int
     output_tokens: int
     total_tokens: int
+    finish_reason: str 
+    max_output_tokens: int | None = None
+    
 
 
 
@@ -34,67 +37,73 @@ class LLMClient:
         )
 
 
-    def generate(self,developer_instruction: str,user_prompt: str,) -> GenerationResult:
-        """ Send a prompt and return generated text """
+    def generate(
+        self,
+        developer_instruction: str,
+        user_prompt: str,
+        max_output_tokens: int | None = None,
+    ) -> GenerationResult:
+        """Send structured messages and return the generated result."""
 
-        if not user_prompt.strip():
-            raise ValueError("The prompt cannot be empty.")
+        if max_output_tokens is not None and max_output_tokens <= 0:
+            raise ValueError(
+                "max_output_tokens must be greater than zero."
+            )
 
         messages = build_messages(
             developer_instruction=developer_instruction,
             user_prompt=user_prompt,
         )
 
-        response = self._client.responses.create (
-            model=self._settings.model,
-            input=messages,
-        )
-
-        if response.status != 'completed':
-            raise RuntimeError(
-                f'The model did not complete. Status:{response.status}'
+        if max_output_tokens is None:
+            response = self._client.responses.create(
+                model=self._settings.model,
+                input=messages,
+            )
+        else:
+            response = self._client.responses.create(
+                model=self._settings.model,
+                input=messages,
+                max_output_tokens=max_output_tokens,
             )
 
+        finish_reason = None
+
+        if response.incomplete_details is not None:
+            finish_reason = response.incomplete_details.reason
+
+        if response.status not in {"completed", "incomplete"}:
+            raise RuntimeError(
+                "The model response ended with an unexpected status. "
+                f"Status: {response.status}"
+            )
+
+        text = response.output_text
+
+        if not text:
+            if finish_reason == "max_output_tokens":
+                raise RuntimeError(
+                    "The model reached the output-token limit before "
+                    "producing visible text. Try increasing "
+                    "--max-output-tokens."
+                )
+
+            raise RuntimeError(
+                "The response contained no text output."
+            )
 
         if response.usage is None:
             raise RuntimeError(
                 "The response did not contain token usage information."
             )
 
-        text = response.output_text
-
         return GenerationResult(
             response_id=response.id,
-            model_used=response.model,
+            model=response.model,
             status=response.status,
+            finish_reason=finish_reason,
             text=text,
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             total_tokens=response.usage.total_tokens,
         )
-
-         #return response.output_text
-
-        # text_parts : list[str] = []
-
-        # for output_item in response.output:               (why response.output_text is used)
-        #     if output_item.type!= "message":
-        #         continue 
-
-        #     for content_item in output_item.content:
-        #         if content_item.type == "output_text":
-        #             text_parts.append(content_item.text)
-
-        # return "".join(text_parts)
-
-
-
-        # response_dictionary = response.model_dump()
-
-        # print("\n--- Dictionary representation ---")     (dictionary response over why SDK is better)
-        # pprint(response_dictionary)
-
-        # return response.output_text
-
-
-

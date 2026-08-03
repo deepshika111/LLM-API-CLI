@@ -4,13 +4,13 @@ import argparse
 from dataclasses import dataclass
 from typing import Sequence
 
-:
 @dataclass(frozen=True)
 class CLIArguments:
     """Validated values supplied through the command line."""
 
     prompt: str
     show_metadata: bool
+    max_output_tokens: int | None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,6 +34,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Display response ID, model, status, and token usage.",
     )
 
+    parser.add_argument(
+    "--max-output-tokens",
+    type=int,
+    default=None,
+    help="Maximum number of output tokens the model may generate.",
+)
+
     return parser
 
 
@@ -47,10 +54,16 @@ def parse_arguments(
 
     prompt = namespace.prompt.strip()
 
+    max_output_tokens = namespace.max_output_tokens
+
+    if max_output_tokens is not None and max_output_tokens <= 0:
+        parser.error("--max-output-tokens must be greater than zero.")
+
     if not prompt:
         parser.error("--prompt cannot be empty.")
 
     return CLIArguments(
         prompt=prompt,
         show_metadata=namespace.show_metadata,
+        max_output_tokens=max_output_tokens,
     )
